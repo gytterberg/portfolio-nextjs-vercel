@@ -1,3 +1,12 @@
+# Next.js/Vercel portfolio site
+
+## Notes
+
+- Tailwind - should I be using this? Probably should be at least familiar.
+  - base unit - does each property have its own native spacing? using unitless numbers in util classes seems to get you different results
+
+## Template readme below
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
