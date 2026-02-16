@@ -1,9 +1,19 @@
 # Next.js/Vercel portfolio site
 
+## Todo
+
+- get a UI library set up, get some shit on the page
+- get a claude (?) context environment set up
+  - or otherwise figure out how you're going to use ai
+- gallery page/mini app
+  - figure out where to draw photos from.... just this repo?
+- blog page/mini app
+
 ## Notes
 
 - Tailwind - should I be using this? Probably should be at least familiar.
   - base unit - does each property have its own native spacing? using unitless numbers in util classes seems to get you different results
+- Or ShadCN? probably use that, since "ai"
 
 ## Template readme below
 

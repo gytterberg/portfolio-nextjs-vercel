@@ -1,83 +1,207 @@
+'use client';
+
+import NavLink from '@/components/NavLink';
+import useInView from '@/hooks/useInView';
+import classNames from 'classnames';
 import Image from 'next/image';
+import Link from 'next/link';
+import { createContext, useContext, useRef, useState } from 'react';
 
-function HomeTemplate() {
+type HomeContext = {
+  activeSection: string | null;
+  sectionRefs: Record<string, React.RefObject<HTMLElement | null>>;
+};
+
+const SECTIONS = ['About', 'Experience', 'Projects', 'Blog'];
+const HomeContext = createContext<HomeContext | null>(null);
+
+/**
+ * TODO:
+ *
+ * get rid of context? don't really need it, just worry about id title
+ * get rid of useActiveSection (or use it isntead idk)
+ * debounce or whatever the section headers, or just give preference to first
+ *
+ */
+
+const HomeLayout = ({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) => {
+  const sectionRefs = SECTIONS.reduce(
+    (acc, section) => {
+      acc[section] = useRef(null);
+      return acc;
+    },
+    {} as Record<string, React.RefObject<HTMLElement | null>>,
+  );
+
+  const activeSection = useInView({ refs: Object.values(sectionRefs) });
+
   return (
-    <div className='font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20'>
-      <main className='flex flex-col gap-[32px] row-start-2 items-center sm:items-start'>
-        <Image className='dark:invert' src='/next.svg' alt='Next.js logo' width={180} height={38} priority />
-        <ol className='font-mono list-inside list-decimal text-sm/6 text-center sm:text-left'>
-          <li className='mb-2 tracking-[-.01em]'>
-            Get started by editing{' '}
-            <code className='bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded'>
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className='tracking-[-.01em]'>Save and see your changes instantly.</li>
-        </ol>
+    <HomeContext value={{ activeSection, sectionRefs }}>
+      <main className='mx-auto'>
+        <div className='min-h-screen max-w-screen-xl md:flex md:justify-between md:gap-10'>{children}</div>
+      </main>
+    </HomeContext>
+  );
+};
 
-        <div className='flex gap-4 items-center flex-col sm:flex-row'>
-          <a
-            className='rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto'
-            href='https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app'
-            target='_blank'
-            rel='noopener noreferrer'
-          >
-            <Image className='dark:invert' src='/vercel.svg' alt='Vercel logomark' width={20} height={20} />
-            Deploy now
-          </a>
-          <a
-            className='rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]'
-            href='https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app'
-            target='_blank'
-            rel='noopener noreferrer'
-          >
-            Read our docs
-          </a>
+const SplashImage = () => {
+  return (
+    <header className='md:sticky md:top-0 md:self-start md:py-10'>
+      <div className='relative w-fit'>
+        <Image
+          src='/bus_cones_photo.jpeg'
+          alt='Photo of the author taking a picture of some traffic cones, as a city bus passes behind.'
+          height='1242'
+          width='897'
+        />
+        <div className='absolute top-0 right-0 flex h-full w-2/3 flex-col bg-gradient-to-l from-black/80 to-transparent'>
+          {[1, 2, 3].map((val) => (
+            <div key={val} className='h-full w-full backdrop-blur-xs mask-to-transparent' />
+          ))}
         </div>
-      </main>
-      <footer className='row-start-3 flex gap-[24px] flex-wrap items-center justify-center'>
-        <a
-          className='flex items-center gap-2 hover:underline hover:underline-offset-4'
-          href='https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app'
-          target='_blank'
-          rel='noopener noreferrer'
+        <div className='justify-top items-right absolute top-0 right-0 flex h-full w-2/3 flex-col pt-10 pr-10 text-white text-shadow-lg/80'>
+          <h1 className='mb-4 text-right text-4xl font-bold'>Gabriel&nbsp;Ytterberg</h1>
+          <p className='text-md text-right'>
+            Software engineer, web developer, itinerant tinkerer, compulsive learner.
+          </p>
+          <NavLinks />
+        </div>
+      </div>
+    </header>
+  );
+};
+
+const NavLinks = ({ children }: { children?: React.ReactNode }) => {
+  const context = useContext(HomeContext);
+
+  // TODO: this sucks
+  if (!context) {
+    throw new Error('NavLinks must be used within a HomeLayout');
+  }
+
+  const { activeSection, sectionRefs } = context;
+
+  console.log('context', context);
+
+  return (
+    <div className='flex flex-col pt-20'>
+      {SECTIONS.map((section) => (
+        <Link
+          key={section}
+          href={`#${section.toLowerCase()}`}
+          className={classNames('text-md pt-5 pr-8 text-right', {
+            'text-red-600': activeSection === section.toLowerCase(),
+          })}
         >
-          <Image aria-hidden src='/file.svg' alt='File icon' width={16} height={16} />
-          Learn
-        </a>
-        <a
-          className='flex items-center gap-2 hover:underline hover:underline-offset-4'
-          href='https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app'
-          target='_blank'
-          rel='noopener noreferrer'
-        >
-          <Image aria-hidden src='/window.svg' alt='Window icon' width={16} height={16} />
-          Examples
-        </a>
-        <a
-          className='flex items-center gap-2 hover:underline hover:underline-offset-4'
-          href='https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app'
-          target='_blank'
-          rel='noopener noreferrer'
-        >
-          <Image aria-hidden src='/globe.svg' alt='Globe icon' width={16} height={16} />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          {section}
+        </Link>
+      ))}
     </div>
+  );
+};
+
+// TODO: basic section headers, about info, scrollable indicated by overlay text on left
+// section: About/short bio
+// section: Experience/short CV
+// section: Projects/portfolio pieces
+// section: Blog/recent posts
+const Content = () => {
+  return (
+    <div className='md:py-10'>
+      <ContentSection title='About'>
+        <p>This site serves as a public portfolio and CV, both for professional work and amateur projects.</p>
+        <p>This site serves as a public portfolio and CV, both for professional work and amateur projects.</p>
+        <p>
+          AAAaaa aaa aAAA aaaaA. AAAaaa aaa aAAA aaaaA. AAAaaa aaa aAAA aaaaA. AAAaaa aaa aAAA aaaaA. AAAaaa aaa aAAA
+          aaaaA.{' '}
+        </p>
+        <p>
+          AAAaaa aaa aAAA aaaaA. AAAaaa aaa aAAA aaaaA. AAAaaa aaa aAAA aaaaA. AAAaaa aaa aAAA aaaaA. AAAaaa aaa aAAA
+          aaaaA.{' '}
+        </p>
+        <p>
+          AAAaaa aaa aAAA aaaaA. AAAaaa aaa aAAA aaaaA. AAAaaa aaa aAAA aaaaA. AAAaaa aaa aAAA aaaaA. AAAaaa aaa aAAA
+          aaaaA.{' '}
+        </p>
+      </ContentSection>
+      <ContentSection title='Experience'>
+        <p>This site serves as a public portfolio and CV, both for professional work and amateur projects.</p>
+        <p>Experience experience Experience EXPERIENCE... (experience.)</p>
+        <p>Experience experience Experience EXPERIENCE... (experience.)</p>
+        <p>Experience experience Experience EXPERIENCE... (experience.)</p>
+        <p>Experience experience Experience EXPERIENCE... (experience.)</p>
+        <p>Experience experience Experience EXPERIENCE... (experience.)</p>
+        <p>Experience experience Experience EXPERIENCE... (experience.)</p>
+      </ContentSection>
+      <ContentSection title='Projects'>
+        <p>
+          Something about projects are always happening and how much I respect nerds who make youtube videos but I never
+          will. Blah hasdfa asdfgoaha.
+        </p>
+        <p>
+          Something about projects are always happening and how much I respect nerds who make youtube videos but I never
+          will. Blah hasdfa asdfgoaha.
+        </p>
+        <p>
+          Something about projects are always happening and how much I respect nerds who make youtube videos but I never
+          will. Blah hasdfa asdfgoaha.
+        </p>
+        <p>
+          Something about projects are always happening and how much I respect nerds who make youtube videos but I never
+          will. Blah hasdfa asdfgoaha.
+        </p>
+        <p>
+          Something about projects are always happening and how much I respect nerds who make youtube videos but I never
+          will. Blah hasdfa asdfgoaha.
+        </p>
+      </ContentSection>
+      <ContentSection title='Blog'>
+        <p>Blog blog BLOG... (blog.)</p>
+        <p>Blog blog BLOG... (blog.)</p>
+        <p>Blog blog BLOG... (blog.)</p>
+        <p>Blog blog BLOG... (blog.)</p>
+        <p>Blog blog BLOG... (blog.)</p>
+        <p>Blog blog BLOG... (blog.)</p>
+        <p className='pb-200'>empty space</p>
+      </ContentSection>
+    </div>
+  );
+};
+
+type ContentSectionProps = {
+  title: string;
+  children: React.ReactNode;
+};
+
+const ContentSection = ({ title, children }: ContentSectionProps) => {
+  const context = useContext(HomeContext);
+
+  // TODO: this sucks
+  if (!context) {
+    throw new Error('NavLinks must be used within a HomeLayout');
+  }
+
+  const { sectionRefs } = context;
+
+  return (
+    <section ref={sectionRefs[title]} id={title.toLowerCase()} className='mb-10'>
+      <h2 className='mb-2 text-xl font-bold'>{title}</h2>
+      {children}
+    </section>
+  );
+};
+
+function Home() {
+  return (
+    <HomeLayout>
+      <SplashImage />
+      <Content />
+    </HomeLayout>
   );
 }
 
-export default function Home() {
-  return (
-    <div>
-      <main>
-        <p>Portfolio site coming soon...</p>
-      </main>
-      <footer>
-        <p>A footer...</p>
-      </footer>
-    </div>
-  );
-}
+export default Home;
