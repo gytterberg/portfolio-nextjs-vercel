@@ -8,7 +8,8 @@ import { useActiveSection } from '@/hooks/useActiveSection';
 
 type NavLinkProps = LinkProps & React.AnchorHTMLAttributes<HTMLAnchorElement>;
 
-function NavLink({ href, className, children, ...rest }: NavLinkProps) {
+// not current used
+function _NavLink({ href, className, children, ...rest }: NavLinkProps) {
   const pathname = usePathname();
   const [hash, setHash] = useState('');
 
@@ -67,4 +68,4 @@ function NavLink({ href, className, children, ...rest }: NavLinkProps) {
   );
 }
 
-export default NavLink;
+export default _NavLink;

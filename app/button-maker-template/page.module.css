@@ -1,0 +1,55 @@
+@media print {
+  /* 1. Reset the parent container to block layout */
+  .pageContainer {
+    display: block !important;
+    float: none !important;
+  }
+
+  /* 2. Style your modern break element */
+  .breakAfterPage {
+    display: block;
+    clear: both;
+    page-break-after: always; /* For backward compatibility */
+    break-after: page; /* Modern standard property */
+    height: 0;
+    visibility: hidden;
+  }
+
+  .buttonContainer {
+    /* Prevents an item from splitting across two physical pages */
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
+
+.frameCounterContainer {
+  display: flex;
+  align-self: center;
+  justify-self: center;
+  position: relative;
+}
+
+.frameCounter {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate(-50%, 0);
+  z-index: 11;
+  font-size: 11px;
+  padding: 1px;
+}
+
+/* 2. Parameterize the pan and zoom based on the image index */
+.imageFrame {
+  width: auto;
+  height: auto; /* 1.156in * 1.2; */
+  /* object-fit: unset; */
+  display: flex;
+  align-self: center;
+  justify-self: center;
+
+  /* Dynamic Pan: shifts the X and Y coordinates progressively based on the index */
+  transform: translateX(var(--img-pan-x)) translateY(var(--img-pan-y)) scale(calc((var(--img-zoom))));
+  /* Optional: Smooth transition when elements load or change screens
+  transition: transform 0.3s ease-out; */
+}

@@ -17,10 +17,9 @@ const HomeContext = createContext<HomeContext | null>(null);
 
 /**
  * TODO:
- *
- * get rid of context? don't really need it, just worry about id title
- * get rid of useActiveSection (or use it isntead idk)
  * debounce or whatever the section headers, or just give preference to first
+ * content
+ * figure out image sizing for different layouts
  *
  */
 
@@ -88,14 +87,17 @@ const NavLinks = ({ children }: { children?: React.ReactNode }) => {
   console.log('context', context);
 
   return (
-    <div className='flex flex-col pt-20'>
+    <div className='flex flex-col items-end pt-20'>
       {SECTIONS.map((section) => (
         <Link
           key={section}
           href={`#${section.toLowerCase()}`}
-          className={classNames('text-md pt-5 pr-8 text-right', {
-            'text-red-600': activeSection === section.toLowerCase(),
-          })}
+          className={classNames(
+            'text-md relative pt-5 pr-8 text-right after:absolute after:bottom-0 after:left-0 after:block after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-white after:transition-transform after:duration-300',
+            {
+              'font-bold after:scale-x-100': activeSection === section.toLowerCase(),
+            },
+          )}
         >
           {section}
         </Link>

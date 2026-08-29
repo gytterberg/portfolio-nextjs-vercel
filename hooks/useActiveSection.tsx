@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 // TODO: use refs for observable components
 // TODO: use a ref to store the observer and disconnect on unmount
 
+// used only by Navlink
 const useActiveSection = () => {
   const [activeSection, setActiveSection] = useState('');
   const observer = useRef<null | IntersectionObserver>(null);
